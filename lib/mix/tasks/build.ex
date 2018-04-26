@@ -1,6 +1,22 @@
 defmodule Mix.Tasks.CodeRunner.Build do
   use Mix.Task
 
+  defp root() do
+    :code.priv_dir(:code_runner)
+  end
+
+  defp containers_root() do
+    "#{root()}/containers"
+  end
+
+  defp container_root(container) do
+    "#{containers_root()}/#{container}"
+  end
+
+  defp container_tag_root(container, tag) do
+    "#{container_root(container)}/#{tag}"
+  end
+
   defp pull_code_runner() do
     IO.puts(
       "Pull code_runner from https://gitlab.com/nathanfaucett/rs-code_runner/raw/master/bin/code_runner"
@@ -39,22 +55,6 @@ defmodule Mix.Tasks.CodeRunner.Build do
       parallelism: true,
       cd: image_root
     )
-  end
-
-  defp root() do
-    "#{File.cwd!()}/priv"
-  end
-
-  defp containers_root() do
-    "#{root()}/containers"
-  end
-
-  defp container_root(container) do
-    "#{containers_root()}/#{container}"
-  end
-
-  defp container_tag_root(container, tag) do
-    "#{container_root(container)}/#{tag}"
   end
 
   def run(_args) do
