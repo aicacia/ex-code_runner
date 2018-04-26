@@ -1,9 +1,9 @@
-defmodule Runner.MixProject do
+defmodule CodeRunner.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :runner,
+      app: :code_runner,
       version: "0.1.0",
       elixir: "~> 1.4",
       start_permanent: Mix.env() == :prod,
@@ -14,7 +14,7 @@ defmodule Runner.MixProject do
   # Run "mix help compile.app" to learn about applications.
   def application do
     [
-      mod: {Runner.Application, []},
+      mod: {CodeRunner.Application, []},
       extra_applications: [:logger]
     ]
   end

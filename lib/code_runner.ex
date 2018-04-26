@@ -1,6 +1,6 @@
-defmodule Runner do
-  alias Runner.Docker
-  alias Runner.Docker.Attach
+defmodule CodeRunner do
+  alias CodeRunner.Docker
+  alias CodeRunner.Docker.Attach
 
   def run(%{language: language, tag: tag, files: files, argv: argv}) do
     image = language_to_image(String.downcase(language))
@@ -8,7 +8,7 @@ defmodule Runner do
     %{"Id" => cid} =
       Docker.post!(
         "containers/create",
-        create_config("runner/#{image}:#{tag}")
+        create_config("code_runner/#{image}:#{tag}")
       )
 
     Docker.post!("containers/#{cid}/start")

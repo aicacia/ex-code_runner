@@ -1,10 +1,10 @@
-defmodule Runner.Docker do
+defmodule CodeRunner.Docker do
   def http_host do
-    "#{Application.get_env(:runner, :http_host)}"
+    "#{Application.get_env(:code_runner, :http_host)}"
   end
 
   def tcp_host do
-    "#{Application.get_env(:runner, :tcp_host)}"
+    "#{Application.get_env(:code_runner, :tcp_host)}"
   end
 
   defp headers do

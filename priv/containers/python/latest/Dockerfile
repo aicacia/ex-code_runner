@@ -1,10 +1,10 @@
 FROM python:latest
 MAINTAINER Nathan Faucett "nathanfaucett@gmail.com"
 
-# Install runner
-COPY runner /home/runner/runner
-RUN chmod +x /home/runner/runner
+# Install code_runner
+COPY code_runner /home/code_runner/code_runner
+RUN chmod +x /home/code_runner/code_runner
 
-WORKDIR /home/runner/
-ENTRYPOINT "/home/runner/runner"
-CMD ["/home/runner/runner"]
+WORKDIR /home/code_runner/
+ENTRYPOINT "/home/code_runner/code_runner"
+CMD ["/home/code_runner/code_runner"]

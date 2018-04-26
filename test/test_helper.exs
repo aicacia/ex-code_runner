@@ -1,11 +1,11 @@
 defmodule Test do
-  defmacro test_runner(type, file, filepath) do
+  defmacro test_code_runner(type, file, filepath) do
     quote do
       test("should return parsed json with Hello, world! from #{unquote(type)}") do
         content = File.read!("#{File.cwd!()}/#{unquote(filepath)}")
 
         {:ok, result} =
-          Runner.run(%{
+          CodeRunner.run(%{
             language: unquote(type),
             files: [
               %{name: unquote(file), content: content}

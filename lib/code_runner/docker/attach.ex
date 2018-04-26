@@ -1,7 +1,7 @@
-defmodule Runner.Docker.Attach do
+defmodule CodeRunner.Docker.Attach do
   use GenServer
 
-  alias Runner.Docker
+  alias CodeRunner.Docker
 
   @timeout 60_000
 
@@ -151,7 +151,7 @@ defmodule Runner.Docker.Attach do
   end
 
   def attach!(cid) do
-    {:ok, pid} = Runner.Docker.Supervisor.start_child(cid)
+    {:ok, pid} = CodeRunner.Docker.Supervisor.start_child(cid)
     :ok = GenServer.call(pid, {:attach}, @timeout)
     pid
   end

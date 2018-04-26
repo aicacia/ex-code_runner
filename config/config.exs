@@ -10,11 +10,11 @@ use Mix.Config
 
 # You can configure your application as:
 #
-#     config :runner, key: :value
+#     config :code_runner, key: :value
 #
 # and access this configuration in your application as:
 #
-#     Application.get_env(:runner, :key)
+#     Application.get_env(:code_runner, :key)
 #
 # You can also configure a 3rd-party app:
 #
@@ -29,6 +29,6 @@ use Mix.Config
 #
 #     import_config "#{Mix.env}.exs"
 
-config :runner,
+config :code_runner,
   tcp_host: "tcp://localhost:9876",
   http_host: "http+unix://%2Fvar%2Frun%2Fdocker.sock"

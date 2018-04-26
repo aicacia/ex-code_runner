@@ -1,7 +1,7 @@
-defmodule Runner.Docker.Supervisor do
+defmodule CodeRunner.Docker.Supervisor do
   use DynamicSupervisor
 
-  alias Runner.Docker.Attach
+  alias CodeRunner.Docker.Attach
 
   def start_link(_arg) do
     DynamicSupervisor.start_link(__MODULE__, :ok, name: __MODULE__)

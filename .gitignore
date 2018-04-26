@@ -20,6 +20,6 @@ erl_crash.dump
 *.ez
 
 # Ignore package tarball (built via "mix hex.build").
-runner-*.tar
+code_runner-*.tar
 
-/priv/**/runner
+/priv/**/code_runner
