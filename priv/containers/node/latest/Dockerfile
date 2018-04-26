@@ -1,4 +1,4 @@
-FROM python:latest
+FROM node:latest
 MAINTAINER Nathan Faucett "nathanfaucett@gmail.com"
 
 # Install runner

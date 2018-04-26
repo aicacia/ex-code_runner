@@ -2,7 +2,7 @@ defmodule Runner do
   alias Runner.Docker
   alias Runner.Docker.Attach
 
-  def run(%{"language" => language, "tag" => tag, "files" => files, "argv" => argv}) do
+  def run(%{language: language, tag: tag, files: files, argv: argv}) do
     image = language_to_image(String.downcase(language))
 
     %{"Id" => cid} =
@@ -34,17 +34,20 @@ defmodule Runner do
     result
   end
 
-  def run(%{"language" => _language, "files" => _files} = input) do
+  def run(%{language: _language, files: _files} = input) do
     run(
       input
-      |> Map.put("tag", Map.get(input, "tag", "latest"))
-      |> Map.put("argv", Map.get(input, "argv", []))
+      |> Map.put(:tag, Map.get(input, :tag, "latest"))
+      |> Map.put(:argv, Map.get(input, :argv, []))
     )
   end
 
   def language_to_image("ecmascript"), do: "node"
-
   def language_to_image("javascript"), do: "node"
+  def language_to_image("gcc"), do: "c"
+  def language_to_image("g++"), do: "cpp"
+  def language_to_image("clang"), do: "c"
+  def language_to_image("clang++"), do: "cpp"
 
   def language_to_image(language) do
     language

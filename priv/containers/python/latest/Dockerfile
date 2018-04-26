@@ -1,4 +1,4 @@
-FROM rust:latest
+FROM python:latest
 MAINTAINER Nathan Faucett "nathanfaucett@gmail.com"
 
 # Install runner
