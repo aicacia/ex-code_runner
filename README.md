@@ -22,6 +22,19 @@ create the docker containers first
 $ mix code_runner.build
 ```
 
+## Usage
+
+```elixir
+CodeRunner.run(%{
+  language: "elixir",
+  argv: [],
+  files: [%{
+    file: "main.ex",
+    contents: "IO.puts(\"Hello, world!\")"
+  }]
+})
+```
+
 ## Installation
 
 If [available in Hex](https://hex.pm/docs/publish), the package can be installed
@@ -30,6 +43,8 @@ by adding `code_runner` to your list of dependencies in `mix.exs`:
 ```elixir
 def deps do
   [
+    {:code_runner, git: "git@github.com:nathanfaucett/ex-code_runner.git"}
+    # or if I push it
     {:code_runner, "~> 0.1.0"}
   ]
 end
