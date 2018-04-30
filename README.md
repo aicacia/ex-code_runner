@@ -1,10 +1,10 @@
 # CodeRunner
 
-code code_runner
+code runner using [https://gitlab.com/nathanfaucett/rs-code_runner](https://gitlab.com/nathanfaucett/rs-code_runner)
 
 ## Config
 
-docker should be accessable from tcp and http
+docker must be accessible over tcp and http
 
 ```elixir
 # config/config.exs
@@ -16,7 +16,7 @@ config :code_runner,
 
 ## Build
 
-create the docker containers first
+build the docker containers
 
 ```bash
 $ mix code_runner.build

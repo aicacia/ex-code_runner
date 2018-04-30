@@ -18,16 +18,23 @@ defmodule Mix.Tasks.CodeRunner.Build do
   end
 
   defp pull_code_runner() do
-    IO.puts(
-      "Pull code_runner from https://gitlab.com/nathanfaucett/rs-code_runner/raw/master/bin/code_runner"
+    if !File.exists?("#{root()}/rs-code_runner") do
+      System.cmd(
+        "git",
+        ["clone", "https://gitlab.com/nathanfaucett/rs-code_runner.git"],
+        into: IO.stream(:stdio, :line),
+        parallelism: true,
+        cd: "#{root()}"
+      )
+    end
+
+    System.cmd(
+      "git",
+      ["pull"],
+      into: IO.stream(:stdio, :line),
+      parallelism: true,
+      cd: "#{root()}/rs-code_runner"
     )
-
-    %HTTPoison.Response{body: body} =
-      HTTPoison.get!("https://gitlab.com/nathanfaucett/rs-code_runner/raw/master/bin/code_runner")
-
-    IO.puts("Pulled code_runner")
-
-    File.write!("#{root()}/code_runner", body)
   end
 
   defp build_all() do
@@ -46,7 +53,7 @@ defmodule Mix.Tasks.CodeRunner.Build do
   defp build(container, tag) do
     image_root = container_tag_root(container, tag)
 
-    File.cp!("#{root()}/code_runner", "#{image_root}/code_runner")
+    File.cp!("#{root()}/rs-code_runner/bin/code_runner", "#{image_root}/code_runner")
 
     System.cmd(
       "docker",
@@ -57,8 +64,17 @@ defmodule Mix.Tasks.CodeRunner.Build do
     )
   end
 
-  def run(_args) do
+  def run(args) do
+    image = Enum.at(args, 0, nil)
+    tag = Enum.at(args, 1, "latest")
+
     HTTPoison.start()
-    build_all()
+
+    if image == nil do
+      build_all()
+    else
+      pull_code_runner()
+      build(image, tag)
+    end
   end
 end

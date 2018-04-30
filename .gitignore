@@ -22,4 +22,5 @@ erl_crash.dump
 # Ignore package tarball (built via "mix hex.build").
 code_runner-*.tar
 
-/priv/**/code_runner
+/priv/containers/**/code_runner
+/priv/rs-code_runner
