@@ -3,8 +3,6 @@ defmodule CodeRunner.Docker.Attach do
 
   alias CodeRunner.Docker
 
-  @timeout 60_000
-
   def initial_state(cid) do
     %{cid: cid, socket: nil, from: nil, state: nil, buffer: []}
   end
@@ -152,15 +150,20 @@ defmodule CodeRunner.Docker.Attach do
 
   def attach!(cid) do
     {:ok, pid} = CodeRunner.Docker.Supervisor.start_child(cid)
-    :ok = GenServer.call(pid, {:attach}, @timeout)
+    :ok = GenServer.call(pid, {:attach})
     pid
   end
 
-  def send!(pid, payload) do
-    GenServer.call(pid, {:send, payload}, @timeout)
+  def send!(pid, payload, timeout) do
+    try do
+      GenServer.call(pid, {:send, payload}, timeout)
+    catch
+      :exit, _ ->
+        {:error, %{"stdout" => "", "stderr" => "", "error" => "Timeout"}}
+    end
   end
 
   def detach!(pid) do
-    :ok = GenServer.call(pid, {:detach}, @timeout)
+    :ok = GenServer.call(pid, {:detach})
   end
 end

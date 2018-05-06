@@ -13,4 +13,17 @@ defmodule CodeRunnerTest do
   Test.test_code_runner("python", "main.py", "test/snippets/main.py")
   Test.test_code_runner("ruby", "main.rb", "test/snippets/main.rb")
   Test.test_code_runner("rust", "main.rs", "test/snippets/main.rs")
+
+  test "should send timeout error" do
+    {:error, result} =
+      CodeRunner.run(%{
+        timeout: 0,
+        language: "node",
+        files: [
+          %{name: "main.js", content: "console.log(\"Hello, world!\");"}
+        ]
+      })
+
+    assert result == %{"stdout" => "", "stderr" => "", "error" => "Timeout"}
+  end
 end

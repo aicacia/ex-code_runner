@@ -2,8 +2,12 @@ defmodule CodeRunner do
   alias CodeRunner.Docker
   alias CodeRunner.Docker.Attach
 
-  def run(%{language: language, tag: tag, files: files, argv: argv}) do
+  # wait 5 minutes 60_000 * 5
+  @default_timeout 300_000
+
+  def run(%{language: language, tag: tag, files: files, argv: argv} = input) do
     image = language_to_image(String.downcase(language))
+    timeout = min(Map.get(input, :timeout, @default_timeout), @default_timeout)
 
     %{"Id" => cid} =
       Docker.post!(
@@ -22,7 +26,8 @@ defmodule CodeRunner do
           "language" => language,
           "argv" => argv,
           "files" => files
-        })
+        }),
+        timeout
       )
 
     Attach.detach!(pid)
