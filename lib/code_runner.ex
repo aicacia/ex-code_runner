@@ -2,7 +2,7 @@ defmodule CodeRunner do
   alias CodeRunner.Docker
   alias CodeRunner.Docker.Attach
 
-  # wait 5 minutes 60_000 * 5
+  # max timeout 5 minutes 60_000 * 5
   @default_timeout 300_000
 
   def run(%{language: language, tag: tag, files: files, argv: argv} = input) do

@@ -81,12 +81,17 @@ defmodule CodeRunner.Docker.Attach do
   end
 
   def handle_info({:tcp_closed, _}, %{from: from} = state) do
-    GenServer.reply(from, {:error, "TCP Socket Closed Unexpectedly"})
+    GenServer.reply(from, %{"stdout" => "", "stderr" => "", "error" => "tcp_socket_closed"})
     {:noreply, state}
   end
 
   def handle_info({:tcp_error, _, reason}, %{from: from} = state) do
-    GenServer.reply(from, {:error, reason})
+    GenServer.reply(from, %{"stdout" => "", "stderr" => "", "error" => reason})
+    {:noreply, state}
+  end
+
+  def handle_info(_, %{from: from} = state) do
+    GenServer.reply(from, %{"stdout" => "", "stderr" => "", "error" => "unknown"})
     {:noreply, state}
   end
 
@@ -159,7 +164,7 @@ defmodule CodeRunner.Docker.Attach do
       GenServer.call(pid, {:send, payload}, timeout)
     catch
       :exit, _ ->
-        %{"stdout" => "", "stderr" => "", "error" => "Timeout"}
+        %{"stdout" => "", "stderr" => "", "error" => "timed_out"}
     end
   end
 

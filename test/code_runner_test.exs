@@ -24,6 +24,6 @@ defmodule CodeRunnerTest do
         ]
       })
 
-    assert result == %{"stdout" => "", "stderr" => "", "error" => "Timeout"}
+    assert result == %{"stdout" => "", "stderr" => "", "error" => "timed_out"}
   end
 end
