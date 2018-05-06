@@ -137,15 +137,15 @@ defmodule CodeRunner.Docker.Attach do
   end
 
   def format_response(stderr, "") do
-    {:error, %{"stdout" => "", "stderr" => stderr, "error" => nil}}
+    %{"stdout" => "", "stderr" => stderr, "error" => nil}
   end
 
   def format_response("", stdout) do
-    {:ok, Poison.decode!(stdout)}
+    Poison.decode!(stdout)
   end
 
   def format_response(stderr, stdout) do
-    {:error, %{"stdout" => stdout, "stderr" => stderr, "error" => nil}}
+    %{"stdout" => stdout, "stderr" => stderr, "error" => nil}
   end
 
   def attach!(cid) do
@@ -159,7 +159,7 @@ defmodule CodeRunner.Docker.Attach do
       GenServer.call(pid, {:send, payload}, timeout)
     catch
       :exit, _ ->
-        {:error, %{"stdout" => "", "stderr" => "", "error" => "Timeout"}}
+        %{"stdout" => "", "stderr" => "", "error" => "Timeout"}
     end
   end
 

@@ -15,7 +15,7 @@ defmodule CodeRunnerTest do
   Test.test_code_runner("rust", "main.rs", "test/snippets/main.rs")
 
   test "should send timeout error" do
-    {:error, result} =
+    result =
       CodeRunner.run(%{
         timeout: 0,
         language: "node",

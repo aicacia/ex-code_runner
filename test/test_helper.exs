@@ -4,7 +4,7 @@ defmodule Test do
       test("should return parsed json with Hello, world! from #{unquote(type)}") do
         content = File.read!("#{File.cwd!()}/#{unquote(filepath)}")
 
-        {:ok, result} =
+        result =
           CodeRunner.run(%{
             language: unquote(type),
             files: [
