@@ -1,4 +1,7 @@
 defmodule CodeRunner.Docker do
+  @default_timeout 60_000
+  @default_recv_timeout 60_000
+
   def http_host do
     "#{Application.get_env(:code_runner, :http_host)}"
   end
@@ -7,14 +10,9 @@ defmodule CodeRunner.Docker do
     "#{Application.get_env(:code_runner, :tcp_host)}"
   end
 
-  defp headers do
-    {:ok, hostname} = :inet.gethostname()
-    ["Content-Type": "application/json", Host: hostname]
-  end
-
   def get!(url) do
     "#{http_host()}/#{url}"
-    |> HTTPoison.get!(headers())
+    |> HTTPoison.get!(headers(), options())
     |> decode_body()
   end
 
@@ -22,24 +20,36 @@ defmodule CodeRunner.Docker do
     body = Poison.encode!(body)
 
     "#{http_host()}/#{url}"
-    |> HTTPoison.post!(body, headers())
+    |> HTTPoison.post!(body, headers(), options())
     |> decode_body()
   end
 
   def delete!(url) do
     "#{http_host()}/#{url}"
-    |> HTTPoison.delete!(headers())
+    |> HTTPoison.delete!(headers(), options())
     |> decode_body()
   end
 
-  defp decode_body(%HTTPoison.Response{body: ""}) do
-    nil
+  defp headers do
+    {:ok, hostname} = :inet.gethostname()
+    ["Content-Type": "application/json", Host: hostname]
   end
 
-  defp decode_body(%HTTPoison.Response{body: body}) do
+  defp options do
+    [timeout: @default_timeout, recv_timeout: @default_recv_timeout]
+  end
+
+  defp decode_body(%HTTPoison.Response{body: ""} = response) do
+    Map.put(response, :body, %{})
+  end
+
+  defp decode_body(%HTTPoison.Response{body: body} = response) do
     case Poison.decode(body) do
-      {:ok, map} -> map
-      {:error, _} -> body
+      {:ok, map} ->
+        Map.put(response, :body, map)
+
+      {:error, _} ->
+        Map.put(response, :body, body)
     end
   end
 end

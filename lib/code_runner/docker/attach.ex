@@ -4,7 +4,7 @@ defmodule CodeRunner.Docker.Attach do
   alias CodeRunner.Docker
 
   def initial_state(cid) do
-    %{cid: cid, socket: nil, from: nil, state: nil, buffer: []}
+    %{cid: cid, socket: nil, from: nil, state: nil}
   end
 
   def start_link([], state) do
@@ -44,7 +44,7 @@ defmodule CodeRunner.Docker.Attach do
   end
 
   def handle_call({:send, payload}, from, %{socket: socket} = state) do
-    state = state |> Map.put(:from, from) |> Map.put(:state, :send) |> Map.put(:buffer, [])
+    state = state |> Map.put(:from, from) |> Map.put(:state, :send)
 
     :ok = :gen_tcp.send(socket, payload <> "\n")
 
@@ -69,14 +69,8 @@ defmodule CodeRunner.Docker.Attach do
     {:noreply, state}
   end
 
-  def handle_info({:tcp, _, msg}, %{buffer: buffer, state: :send} = state) do
-    state = state |> Map.put(:buffer, buffer ++ msg)
-    {:noreply, state}
-  end
-
-  def handle_info({:tcp_closed, _}, %{from: from, buffer: buffer, state: :send} = state) do
+  def handle_info({:tcp, _, buffer}, %{from: from, state: :send} = state) do
     GenServer.reply(from, parse_buffer(buffer))
-    state = state |> Map.put(:buffer, [])
     {:noreply, state}
   end
 

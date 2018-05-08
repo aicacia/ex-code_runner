@@ -2,60 +2,74 @@ defmodule CodeRunner do
   alias CodeRunner.Docker
   alias CodeRunner.Docker.Attach
 
-  # max timeout 5 minutes 60_000 * 5
-  @default_timeout 300_000
+  @default_build_timeout 60_000
+  @default_timeout 60_000
 
-  def run(%{language: language, tag: tag, files: files, argv: argv} = input) do
-    image = language_to_image(String.downcase(language))
+  def run(%{lang: lang, tag: tag, files: files, inputs: inputs} = input) do
+    image = lang_to_image(String.downcase(lang))
+
+    build_timeout =
+      min(Map.get(input, :build_timeout, @default_build_timeout), @default_build_timeout)
+
     timeout = min(Map.get(input, :timeout, @default_timeout), @default_timeout)
 
-    %{"Id" => cid} =
-      Docker.post!(
-        "containers/create",
-        create_config("code_runner/#{image}:#{tag}")
-      )
+    name = "code_runner-#{image}-#{tag}"
 
-    Docker.post!("containers/#{cid}/start")
+    Docker.post!(
+      "containers/create?name=#{name}",
+      create_config("code_runner/#{image}:#{tag}")
+    )
 
-    pid = Attach.attach!(cid)
+    %HTTPoison.Response{status_code: 204} = Docker.post!("containers/#{name}/start")
 
-    result =
+    pid = Attach.attach!(name)
+
+    compile_result =
       Attach.send!(
         pid,
         Poison.encode!(%{
-          "language" => language,
-          "argv" => argv,
+          "lang" => lang,
           "files" => files
         }),
-        timeout
+        build_timeout
       )
+
+    run_results =
+      Enum.map(inputs, fn argv ->
+        Attach.send!(
+          pid,
+          Poison.encode!(argv),
+          timeout
+        )
+      end)
 
     Attach.detach!(pid)
 
-    Docker.post!("containers/#{cid}/end")
+    Docker.post!("containers/#{name}/stop")
 
-    Docker.delete!("containers/#{cid}")
-
-    result
+    %{
+      compile: compile_result,
+      results: run_results
+    }
   end
 
-  def run(%{language: _language, files: _files} = input) do
+  def run(%{lang: _lang, files: _files} = input) do
     run(
       input
       |> Map.put(:tag, Map.get(input, :tag, "latest"))
-      |> Map.put(:argv, Map.get(input, :argv, []))
+      |> Map.put(:inputs, Map.get(input, :inputs, [[]]))
     )
   end
 
-  def language_to_image("ecmascript"), do: "node"
-  def language_to_image("javascript"), do: "node"
-  def language_to_image("gcc"), do: "c"
-  def language_to_image("g++"), do: "cpp"
-  def language_to_image("clang"), do: "c"
-  def language_to_image("clang++"), do: "cpp"
+  def lang_to_image("ecmascript"), do: "node"
+  def lang_to_image("javascript"), do: "node"
+  def lang_to_image("gcc"), do: "c"
+  def lang_to_image("g++"), do: "cpp"
+  def lang_to_image("clang"), do: "c"
+  def lang_to_image("clang++"), do: "cpp"
 
-  def language_to_image(language) do
-    language
+  def lang_to_image(lang) do
+    lang
   end
 
   defp create_config(image) do

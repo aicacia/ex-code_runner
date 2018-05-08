@@ -26,12 +26,14 @@ $ mix code_runner.build
 
 ```elixir
 CodeRunner.run(%{
-  language: "elixir",
-  argv: [],
-  files: [%{
-    file: "main.ex",
-    contents: "IO.puts(\"Hello, world!\")"
-  }]
+  lang: "elixir",
+  files: %{
+    "main.ex": "IO.puts(\"Hello, world!\")"
+  },
+  # each run takes and argv array, this will run twice
+  inputs: [[], []],
+  # timeout for each run
+  timeout: 60_000,
 })
 ```
 
