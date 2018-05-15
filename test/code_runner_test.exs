@@ -13,44 +13,4 @@ defmodule CodeRunnerTest do
   Test.test_code_runner("python", "main.py")
   Test.test_code_runner("ruby", "main.rb")
   Test.test_code_runner("rust", "main.rs")
-
-  test "should send timeout error" do
-    %{results: [result]} =
-      CodeRunner.run(%{
-        timeout: 0,
-        lang: "node",
-        files: %{
-          "main.js": "console.log(\"Hello, world!\");"
-        }
-      })
-
-    assert result == %{"stdout" => "", "stderr" => "", "error" => "timed_out"}
-  end
-
-  @moduledoc """
-  test "run while already running" do
-    task0 =
-      Task.async(fn ->
-        CodeRunner.run(%{
-          lang: "node",
-          files: %{
-            "main.js": "console.log(\"Hello, world!\");"
-          }
-        })
-      end)
-
-    task1 =
-      Task.async(fn ->
-        CodeRunner.run(%{
-          lang: "node",
-          files: %{
-            "main.js": "console.log(\"Hello, world!\");"
-          }
-        })
-      end)
-
-    Task.await(task0)
-    Task.await(task1)
-  end
-  """
 end

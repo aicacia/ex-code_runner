@@ -9,7 +9,8 @@ defmodule Test do
         %{results: [result]} =
           CodeRunner.run(%{
             lang: unquote(type),
-            files: files
+            files: files,
+            inputs: [%{timeout: 10.0, argv: []}]
           })
 
         assert result == %{"stdout" => "Hello, world!\n", "stderr" => "", "error" => nil}

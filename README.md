@@ -31,7 +31,7 @@ CodeRunner.run(%{
     "main.ex": "IO.puts(\"Hello, world!\")"
   },
   # each run takes and argv array, this will run twice
-  inputs: [[], []],
+  inputs: [%{timeout: 1.0, argv: []}, %{timeout: 2.0, argv: []}],
   # timeout for each run
   timeout: 60_000,
 })

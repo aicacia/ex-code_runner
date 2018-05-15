@@ -2,50 +2,51 @@ defmodule CodeRunner do
   alias CodeRunner.Docker
   alias CodeRunner.Docker.Attach
 
-  @default_build_timeout 60_000
-  @default_timeout 60_000
+  @default_timeout 300_000
+  @default_run_timeout 10_000
 
   def run(%{lang: lang, tag: tag, files: files, inputs: inputs} = input) do
     image = lang_to_image(String.downcase(lang))
 
-    build_timeout =
-      min(Map.get(input, :build_timeout, @default_build_timeout), @default_build_timeout)
-
     timeout = min(Map.get(input, :timeout, @default_timeout), @default_timeout)
 
-    name = "code_runner-#{image}-#{tag}"
+    %HTTPoison.Response{body: %{"Id" => cid}} =
+      Docker.post!(
+        "containers/create",
+        create_config("code_runner/#{image}:#{tag}")
+      )
 
-    Docker.post!(
-      "containers/create?name=#{name}",
-      create_config("code_runner/#{image}:#{tag}")
-    )
+    %HTTPoison.Response{status_code: 204} = Docker.post!("containers/#{cid}/start")
 
-    %HTTPoison.Response{status_code: 204} = Docker.post!("containers/#{name}/start")
-
-    pid = Attach.attach!(name)
+    pid = Attach.attach!(cid)
 
     compile_result =
       Attach.send!(
         pid,
         Poison.encode!(%{
+          "timeout" => timeout,
           "lang" => lang,
           "files" => files
         }),
-        build_timeout
+        @default_timeout
       )
 
     run_results =
-      Enum.map(inputs, fn argv ->
+      Enum.map(inputs, fn input ->
         Attach.send!(
           pid,
-          Poison.encode!(argv),
-          timeout
+          Poison.encode!(%{
+            timeout: min(Map.get(input, :timeout, @default_run_timeout), @default_run_timeout),
+            argv: Map.get(input, :argv, [])
+          }),
+          @default_timeout
         )
       end)
 
     Attach.detach!(pid)
 
-    Docker.post!("containers/#{name}/stop")
+    Docker.post!("containers/#{cid}/stop")
+    Docker.post!("containers/#{cid}/remove")
 
     %{
       compile: compile_result,
@@ -57,7 +58,7 @@ defmodule CodeRunner do
     run(
       input
       |> Map.put(:tag, Map.get(input, :tag, "latest"))
-      |> Map.put(:inputs, Map.get(input, :inputs, [[]]))
+      |> Map.put(:inputs, Map.get(input, :inputs, [%{timeout: 5.0, argv: []}]))
     )
   end
 
