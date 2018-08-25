@@ -24,3 +24,5 @@ code_runner-*.tar
 
 /priv/containers/**/code_runner
 /priv/rs-code_runner
+
+.elixir_ls
