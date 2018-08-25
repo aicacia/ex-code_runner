@@ -1,0 +1,12 @@
+{application,code_runner,
+             [{applications,[kernel,stdlib,elixir,logger,poison,httpoison]},
+              {description,"code_runner"},
+              {modules,['Elixir.CodeRunner','Elixir.CodeRunner.Application',
+                        'Elixir.CodeRunner.Docker',
+                        'Elixir.CodeRunner.Docker.Attach',
+                        'Elixir.CodeRunner.Docker.Supervisor',
+                        'Elixir.Mix.Tasks.CodeRunner.Build',
+                        'Elixir.Mix.Tasks.CodeRunner.Gen']},
+              {registered,[]},
+              {vsn,"0.1.0"},
+              {mod,{'Elixir.CodeRunner.Application',[]}}]}.

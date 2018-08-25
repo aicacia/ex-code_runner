@@ -45,10 +45,7 @@ defmodule CodeRunner.Docker do
 
   defp decode_body(%HTTPoison.Response{body: body} = response) do
     case Poison.decode(body) do
-      {:ok, map} ->
-        Map.put(response, :body, map)
-
-      {:error, _} ->
+      {:ok, body} ->
         Map.put(response, :body, body)
     end
   end
